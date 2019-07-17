@@ -66,7 +66,7 @@ parser = argparse.ArgumentParser(description='Runs a TestRIG configuration')
 
 # model args
 parser.add_argument('-a', '--implementation-A', metavar='IMP', choices=known_rvfi_dii,
-  default='sail',
+  default='rvbs',
   help="The implementation A to use. (one of {:s})".format(str(known_rvfi_dii)))
 parser.add_argument('--implementation-A-port', metavar='PORT', type=auto_int, default=5000,
   help="The port to use for implementation A's rvfi-dii server")
@@ -117,10 +117,10 @@ parser.add_argument('--path-to-QCVEngine', metavar='PATH', type=str,
   #default=op.join(op.dirname(op.realpath(__file__)), "../../vengines/QuickCheckVEngine/dist-newstyle/build/x86_64-linux/ghc-8.6.3/QCVEngine-0.1.0.0/x/QCVEngine/build/QCVEngine/QCVEngine"),
   help="The PATH to the QCVEngine executable")
 parser.add_argument('--path-to-sail-riscv-dir', metavar='PATH', type=str,
-  default=op.join(op.dirname(op.realpath(__file__)), "../../riscv-implementations/sail-cheri-riscv/c_emulator/"),
+  default=op.join(op.dirname(op.realpath(__file__)), "../../riscv-implementations/sail-riscv/c_emulator/"),
   help="The PATH to the sail-riscv executable directory")
 parser.add_argument('-r', '--architecture', metavar='ARCH', choices=known_architectures,
-  default='rv32i',
+  default='rv64ic',
   help="The architecture to verify. (one of {:s})".format(str(known_architectures)))
 parser.add_argument('--generator', metavar='GENERATOR', choices=known_generators,
   default='internal',
@@ -151,23 +151,23 @@ def input_y_n(prompt):
 rvbs_sim = {
   'rv32i': "rvbs-rv32IZicsrZifencei",
   'rv64i': "rvbs-rv64IZicsrZifencei",
-  'rv64ic': "rvbs-rv64IZicsrZifenceiC",
+  'rv64ic': "rvbs-rv64ICZicsrZifencei",
   'rv64g': "rvbs-rv64IZicsrZifencei",
-  'rv64gc': "rvbs-rv64IZicsrZifenceiC",
+  'rv64gc': "rvbs-rv64ICZicsrZifencei",
   'rv32ixcheri': "rvbs-rv32IZicsrZifenceiXcheri",
   'rv64ixcheri': "rvbs-rv64IZicsrZifenceiXcheri"
 }.get(args.architecture, "rvbs-rv64IZicsrZifenceiXcheri")+"-rvfi-dii"
 
 # figure out which sail simulator to use
 sail_sim = {
-  'rv32i': "cheri_riscv_rvfi_RV32",
-  'rv64i': "cheri_riscv_rvfi_RV64",
-  'rv64ic': "cheri_riscv_rvfi_RV64",
-  'rv64g': "cheri_riscv_rvfi_RV64",
-  'rv64gc': "cheri_riscv_rvfi_RV64",
-  'rv32ixcheri': "cheri_riscv_rvfi_RV32",
-  'rv64ixcheri': "cheri_riscv_rvfi_RV64"
-}.get(args.architecture, "cheri_riscv_rvfi_RV64")
+  'rv32i': "riscv_sim_RV32",
+  'rv64i': "riscv_sim_RV64",
+  'rv64ic': "riscv_sim_RV64",
+  'rv64g': "riscv_sim_RV64",
+  'rv64gc': "riscv_sim_RV64",
+  'rv32ixcheri': "riscv_sim_RV32",
+  'rv64ixcheri': "riscv_sim_RV64"
+}.get(args.architecture, "riscv_sim_RV64")
 
 #########################
 # spawn rvfi_dii server #
