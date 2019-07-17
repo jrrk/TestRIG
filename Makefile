@@ -108,6 +108,12 @@ sail-rv64-cheri:
 ibex-rv32ic:
 	$(MAKE) -C riscv-implementations/ibex/verilator
 
+compare-ibex:
+	utils/scripts/runTestRIG.py -a ibex -r rv32ic
+
+compare-rvbs:
+	utils/scripts/runTestRIG.py
+
 .PHONY: clean-riscv-implementations clean-rvbs clean-sail
 
 clean-riscv-implementations: clean-rvbs clean-spike clean-sail clean-piccolo

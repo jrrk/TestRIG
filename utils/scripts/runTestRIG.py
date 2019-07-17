@@ -57,9 +57,9 @@ def auto_pos_int (x):
 def auto_write_fd (fname):
   return open(fname, 'w')
 
-known_rvfi_dii = set({'spike','rvbs','sail','piccolo','manual'})
+known_rvfi_dii = set({'spike','rvbs','sail','piccolo','ibex','manual'})
 known_vengine  = set({'QCVEngine'})
-known_architectures = set({'rv32i','rv64i','rv64ic','rv64g','rv64gc','rv32ixcheri','rv64ixcheri', 'rvxcheri'})
+known_architectures = set({'rv32i','rv32ic','rv64i','rv64ic','rv64g','rv64gc','rv32ixcheri','rv64ixcheri', 'rvxcheri'})
 known_generators = set({'internal','sail','manual'})
 
 parser = argparse.ArgumentParser(description='Runs a TestRIG configuration')
@@ -104,6 +104,9 @@ parser.add_argument('-d', '--trace-dir', metavar= 'DIRNAME', type=str,
 parser.add_argument('--path-to-rvbs-dir', metavar='PATH', type=str,
   #default='rvbs-rv32i-rvfi-dii',
   default=op.join(op.dirname(op.realpath(__file__)), "../../riscv-implementations/RVBS/output/"),
+  help="The PATH to the rvbs executable directory")
+parser.add_argument('--path-to-ibex-dir', metavar='PATH', type=str,
+  default=op.join(op.dirname(op.realpath(__file__)), "../../riscv-implementations/ibex/verilator/obj_dir"),
   help="The PATH to the rvbs executable directory")
 parser.add_argument('--path-to-spike', metavar='PATH', type=str,
   default=op.join(op.dirname(op.realpath(__file__)), "../../riscv-implementations/riscv-isa-sim/build/spike"),
@@ -157,6 +160,11 @@ rvbs_sim = {
   'rv32ixcheri': "rvbs-rv32IZicsrZifenceiXcheri",
   'rv64ixcheri': "rvbs-rv64IZicsrZifenceiXcheri"
 }.get(args.architecture, "rvbs-rv64IZicsrZifenceiXcheri")+"-rvfi-dii"
+
+# figure out which rvbs simulator to use
+ibex_sim = {
+  'rv32ic': "Vibex_core_avalon"
+}.get(args.architecture, "Vibex_core_avalon")
 
 # figure out which sail simulator to use
 sail_sim = {
@@ -217,6 +225,11 @@ def spawn_rvfi_dii_server(name, port, log, arch="rv32i"):
       cmd = [full_sail_sim, "-m", "-r", str(port)]
     else:
       cmd = [full_sail_sim, "-C", "-m", "-r", str(port)]
+  ##############################################################################
+  elif (name == 'ibex'):
+    print("selected IBEX");
+    env2["RVFI_DII_PORT"] = str(port)
+    cmd = [op.join(args.path_to_ibex_dir, ibex_sim), "--rvfi-dii-port", str(port)]
   ##############################################################################
   elif (name == 'manual'):
     return None
