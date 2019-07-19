@@ -22,3 +22,6 @@
 [submodule "riscv-implementations/ibex"]
 	path = riscv-implementations/ibex
 	url = https://github.com/jrrk/ibex.git
+[submodule "riscv-implementations/ariane"]
+	path = riscv-implementations/ariane
+	url = https://github.com/jrrk/ariane.git

@@ -108,8 +108,14 @@ sail-rv64-cheri:
 ibex-rv32ic:
 	$(MAKE) -C riscv-implementations/ibex/verilator
 
+compare-manual:
+	utils/scripts/runTestRIG.py -a manual -r rv64ic -v --implementation-A-log manual.log
+
+compare-ariane:
+	utils/scripts/runTestRIG.py -a ariane -r rv64ic -v --implementation-A-log ariane.log
+
 compare-ibex:
-	utils/scripts/runTestRIG.py -a ibex -r rv32ic
+	utils/scripts/runTestRIG.py -a ibex -r rv32ic --implementation-A-log ibex.log
 
 compare-rvbs:
 	utils/scripts/runTestRIG.py

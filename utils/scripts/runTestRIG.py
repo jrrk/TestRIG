@@ -57,7 +57,7 @@ def auto_pos_int (x):
 def auto_write_fd (fname):
   return open(fname, 'w')
 
-known_rvfi_dii = set({'spike','rvbs','sail','piccolo','ibex','manual'})
+known_rvfi_dii = set({'spike','rvbs','sail','piccolo','ibex','ariane','manual'})
 known_vengine  = set({'QCVEngine'})
 known_architectures = set({'rv32i','rv32ic','rv64i','rv64ic','rv64g','rv64gc','rv32ixcheri','rv64ixcheri', 'rvxcheri'})
 known_generators = set({'internal','sail','manual'})
@@ -107,7 +107,10 @@ parser.add_argument('--path-to-rvbs-dir', metavar='PATH', type=str,
   help="The PATH to the rvbs executable directory")
 parser.add_argument('--path-to-ibex-dir', metavar='PATH', type=str,
   default=op.join(op.dirname(op.realpath(__file__)), "../../riscv-implementations/ibex/verilator/obj_dir"),
-  help="The PATH to the rvbs executable directory")
+  help="The PATH to the ibex executable directory")
+parser.add_argument('--path-to-ariane-dir', metavar='PATH', type=str,
+  default=op.join(op.dirname(op.realpath(__file__)), "../../riscv-implementations/ariane/work-ver"),
+  help="The PATH to the ariane executable directory")
 parser.add_argument('--path-to-spike', metavar='PATH', type=str,
   default=op.join(op.dirname(op.realpath(__file__)), "../../riscv-implementations/riscv-isa-sim/build/spike"),
   help="The PATH to the spike executable")
@@ -161,10 +164,15 @@ rvbs_sim = {
   'rv64ixcheri': "rvbs-rv64IZicsrZifenceiXcheri"
 }.get(args.architecture, "rvbs-rv64IZicsrZifenceiXcheri")+"-rvfi-dii"
 
-# figure out which rvbs simulator to use
+# figure out which ibex simulator to use
 ibex_sim = {
   'rv32ic': "Vibex_core_avalon"
 }.get(args.architecture, "Vibex_core_avalon")
+
+# figure out which ariane simulator to use
+ariane_sim = {
+  'rv64ic': "Variane_core_avalon"
+}.get(args.architecture, "Variane_core_avalon")
 
 # figure out which sail simulator to use
 sail_sim = {
@@ -187,7 +195,7 @@ def spawn_rvfi_dii_server(name, port, log, arch="rv32i"):
   if log:
     use_log = log
   if 'x' in arch:
-    # x Splits the standard RISC-V exenstions (e.g. rv32i) from non-standard ones like CHERI
+    # x Splits the standard RISC-V extensions (e.g. rv32i) from non-standard ones like CHERI
     [isa, extension] = arch.split('x')
   else:
     # No extension specified in the architecture string
@@ -230,6 +238,11 @@ def spawn_rvfi_dii_server(name, port, log, arch="rv32i"):
     print("selected IBEX");
     env2["RVFI_DII_PORT"] = str(port)
     cmd = [op.join(args.path_to_ibex_dir, ibex_sim), "--rvfi-dii-port", str(port)]
+  ##############################################################################
+  elif (name == 'ariane'):
+    print("selected ARIANE");
+    env2["RVFI_DII_PORT"] = str(port)
+    cmd = [op.join(args.path_to_ariane_dir, ariane_sim), "--rvfi-dii-port", str(port)]
   ##############################################################################
   elif (name == 'manual'):
     return None
@@ -343,6 +356,7 @@ def main():
   finally:
     print('run terminated')
     kill_procs(a,b,generator,e)
+    sub.Popen(["/bin/stty", "sane"])
     exit(0)
 
 if __name__ == "__main__":
