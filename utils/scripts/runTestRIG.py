@@ -109,7 +109,7 @@ parser.add_argument('--path-to-ibex-dir', metavar='PATH', type=str,
   default=op.join(op.dirname(op.realpath(__file__)), "../../riscv-implementations/ibex/verilator/obj_dir"),
   help="The PATH to the ibex executable directory")
 parser.add_argument('--path-to-ariane-dir', metavar='PATH', type=str,
-  default=op.join(op.dirname(op.realpath(__file__)), "../../riscv-implementations/ariane/work-ver"),
+  default=op.join(op.dirname(op.realpath(__file__)), "../../riscv-implementations/ariane/work-rvfi"),
   help="The PATH to the ariane executable directory")
 parser.add_argument('--path-to-spike', metavar='PATH', type=str,
   default=op.join(op.dirname(op.realpath(__file__)), "../../riscv-implementations/riscv-isa-sim/build/spike"),
