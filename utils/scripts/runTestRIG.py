@@ -120,8 +120,10 @@ parser.add_argument('--path-to-piccolo', metavar='PATH', type=str,
 parser.add_argument('--path-to-QCVEngine', metavar='PATH', type=str,
   #default='QCVEngine',
   default=op.join(op.dirname(op.realpath(__file__)), "../../vengines/QuickCheckVEngine/dist/build/QCVEngine/QCVEngine"),
-  #default=op.join(op.dirname(op.realpath(__file__)), "../../vengines/QuickCheckVEngine/dist-newstyle/build/x86_64-linux/ghc-8.6.3/QCVEngine-0.1.0.0/x/QCVEngine/build/QCVEngine/QCVEngine"),
   help="The PATH to the QCVEngine executable")
+parser.add_argument('-T', '--timeout', metavar='TIMEOUT',
+  default='10000000',
+  help="The architecture to verify. (one of {:s})".format(str(known_architectures)))
 parser.add_argument('--path-to-sail-riscv-dir', metavar='PATH', type=str,
   default=op.join(op.dirname(op.realpath(__file__)), "../../riscv-implementations/sail-riscv/c_emulator/"),
   help="The PATH to the sail-riscv executable directory")
@@ -260,9 +262,9 @@ def spawn_rvfi_dii_server(name, port, log, arch="rv32i"):
 # spawn verification engine #
 #############################
 
-def spawn_vengine(name, mport, iport, arch):
+def spawn_vengine(name, mport, iport, arch, timeout):
   if (name == 'QCVEngine'):
-    cmd = [args.path_to_QCVEngine, '-a', str(mport), '-b', str(iport), '-r', str(arch)]
+    cmd = [args.path_to_QCVEngine, '-a', str(mport), '-b', str(iport), '-r', str(arch), '-T', str(timeout)]
     cmd += ['-n', str(args.number_of_tests)]
     if args.verbose > 0:
       cmd += ['-v']
@@ -349,7 +351,7 @@ def main():
 
     time.sleep(args.spawn_delay) # small delay to give time to the spawned servers to be ready to listen
 
-    e = spawn_vengine(args.verification_engine, args.implementation_A_port, args.implementation_B_port, args.architecture)
+    e = spawn_vengine(args.verification_engine, args.implementation_A_port, args.implementation_B_port, args.architecture, args.timeout)
     generator = spawn_generator(args.generator, args.architecture, args.generator_log)
 
     e.wait()
